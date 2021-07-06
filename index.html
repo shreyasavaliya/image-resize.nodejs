@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Upload Your JSON FILE HERE</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="styles.css">
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
+	<main class="main_full">
+		<div class="container" id="uploadContent">
+			<div class="panel">
+				<div class="button_outer">
+					<div class="btn_upload">
+						<input type="file" id="upload_file" name="file-to-upload">
+						Upload JSON
+					</div>
+					<div class="processing_bar"></div>
+					<div class="success_box"></div>
+				</div>
+			</div>
+			<div class="error_msg"></div>
+			<div class="uploaded_file_view" id="uploaded_view">
+				<span class="file_remove">X</span>
+			</div>
+		</div>
+
+		<div id="container" class="loadingAnim d-none">
+			<div class="divider" aria-hidden="true"></div>
+			<p class="loading-text" aria-label="Loading">
+				<span class="letter" aria-hidden="true">L</span>
+				<span class="letter" aria-hidden="true">o</span>
+				<span class="letter" aria-hidden="true">a</span>
+				<span class="letter" aria-hidden="true">d</span>
+				<span class="letter" aria-hidden="true">i</span>
+				<span class="letter" aria-hidden="true">n</span>
+				<span class="letter" aria-hidden="true">g</span>
+			</p>
+		</div>
+
+		<div id="responseTable" class="d-none">
+			<table width="100%" border="1" style="border-collapse: collapse;">
+				<thead>
+					<tr>
+						<th>Images</th>
+					</tr>
+				</thead>
+				<tbody id="imagesRow">
+				</tbody>
+			</table>
+		</div>
+	</main>
+</body>
+
+</html>
+
+<script>
+	var btnUpload = $("#upload_file");
+
+	APPLICATION_URL = 'http://localhost:3000'
+	btnUpload.on("change", function (e) {
+
+		$('#uploadContent').addClass('d-none');
+		$('.loadingAnim').removeClass('d-none');
+
+
+		var file = e.target.files[0];
+		console.log(file);
+
+		if (typeof (file) !== 'undefined' && file.length != 0) {
+			var fd = new FormData();
+			fd.append('file-to-upload', file, file.name);
+			$.ajax({
+				type: "POST",
+				data: fd,
+				contentType: false,
+				processData: false,
+				url: APPLICATION_URL + '/upload',
+				success: function (response) {
+					var returnArray = response;
+					console.log(returnArray);
+					var images = returnArray.final_response;
+					var tr = '';
+					for (let x = 0; x < images.length; x++) {
+						console.log(images[x]);
+						tr += '<tr><td>' + images[x] + '</td></tr>';
+					}
+					$('#imagesRow').append(tr);
+					$('#responseTable').removeClass('d-none');
+					$('.loadingAnim').addClass('d-none');
+
+				},
+			});
+		}
+	});
+
+</script>
